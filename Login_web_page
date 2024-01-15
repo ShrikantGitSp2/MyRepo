@@ -1,0 +1,148 @@
+package Login_Page;
+import static org.testng.Assert.assertTrue;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+
+public class Logon_functionality 
+
+{
+
+    private WebDriver driver;
+
+    @BeforeClass
+    public void setUp() {
+        // Setting ChromeDriver with path and hitting Web url
+        System.setProperty("webdriver.chrome.driver", "path/to/chromedriver");
+        driver = new ChromeDriver();
+        driver.get("URL_Of_Login_Page");
+    }
+
+    @Test(priority = 1)
+    public void testLogin_Validate() {
+        // Test Case 1: Verify that a user with valid credentials can successfully log in.
+       
+    	WebElement usernameInput = driver.findElement(By.id("username"));
+        WebElement passwordInput = driver.findElement(By.id("password"));
+        WebElement loginButton = driver.findElement(By.id("login-button"));
+
+        usernameInput.sendKeys("valid_username");
+        passwordInput.sendKeys("valid_password"); 
+        loginButton.click();
+
+              // Assertion for successful login(Welcome Massage)
+        Assert.assertTrue(driver.getPageSource().contains("Welcome To Home Page"));
+
+             // Additional assertion For example, you can check for elements on the dashboard/homepage after successful login.
+    }
+
+    @Test(priority = 2)
+    public void testInvalid_Login() {
+        // Test Case 2: Validate that an error message is displayed with invalid credentials.
+        
+    	WebElement usernameInput = driver.findElement(By.id("username"));
+        WebElement passwordInput = driver.findElement(By.id("password"));
+        WebElement loginButton = driver.findElement(By.id("login-button"));
+            //Or we can find elements by xpath, id, css, including test, parent-child relation,linkText.
+
+        usernameInput.sendKeys("invalid_username");
+        passwordInput.sendKeys("invalid_password");
+        loginButton.click();
+
+                 // Assertion for error message is displayed 
+       
+        Assert.assertTrue(driver.getPageSource().contains("Invalid credentials"));
+
+        // Test Case 3: Ensure that the login page retains entered values after a failed login attempt.
+      
+        Assert.assertEquals(usernameInput.getAttribute("value"), "invalid_username");
+        Assert.assertEquals(passwordInput.getAttribute("value"), "invalid_password");
+    }
+
+    @Test(priority = 3)
+    public void testLoginButtonStatus() {
+        // Test Case 4: Test that the 'Login' button is disabled when both fields are empty.
+       
+    	WebElement loginButton = driver.findElement(By.id("login-button"));
+        Assert.assertFalse(loginButton.isEnabled());
+
+        // Test Case 5: Confirm 'Login' button is enabled only when both fields are filled with valid input.
+        
+        WebElement usernameInput = driver.findElement(By.id("username"));
+        WebElement passwordInput = driver.findElement(By.id("password"));
+
+        usernameInput.sendKeys("valid_username");
+        passwordInput.sendKeys("valid_password");
+
+        Assert.assertTrue(loginButton.isEnabled());
+    }
+    // Test Case 6: Verify that clicking the 'Forgot Password' link redirects to the password recovery page.
+   
+    @Test(priority = 4)
+    public void testForgotPasswordLink() {
+        driver.get("URL_Of_Login_Page");
+
+        WebElement forgotPasswordLink = driver.findElement(By.linkText("Forgot Password"));
+        forgotPasswordLink.click();
+
+
+        // Assertion for password recovery page 
+        assertTrue(driver.getPageSource().contains("Password Recovery"));
+    }
+    //Test Case 7:Validate the password recovery functionality
+    @Test(priority = 5)
+    public void testPasswordRecoverySteps() {
+        // Step a: Click the 'Forgot Password' link
+        WebElement forgotPasswordLink = driver.findElement(By.linkText("Forgot Password"));
+        forgotPasswordLink.click();
+
+        // Step b: Enter a registered email address
+        WebElement emailField = driver.findElement(By.id("email"));
+        emailField.sendKeys("abc@gmail.com");
+
+        // Step c: Click the 'Recover Password' button
+        WebElement recoverPasswordButton = driver.findElement(By.id("recoverPassword"));
+        recoverPasswordButton.click();
+
+        // Step d: Verify success message
+        WebElement successMessage = driver.findElement(By.id("successMessage"));
+        Assert.assertTrue(successMessage.isDisplayed());
+        
+        // Step e: Simulate the password recovery process
+        // (Implement steps to access the email recovery instructions on email web page)
+
+        // Step f: Reset password
+        // (Implement the steps on email web page to reset the password)
+
+        String baseUrl = "URL_Of_Login_Page";
+		// Step g: Ensure user is redirected to the login page after resetting the password
+        Assert.assertEquals(driver.getCurrentUrl(), baseUrl + "/login");
+
+        // Step h: Validate login with new password
+        WebElement usernameInput = driver.findElement(By.id("NewuUername"));
+        WebElement passwordInput = driver.findElement(By.id("password"));
+        WebElement loginButton = driver.findElement(By.id("login-button"));
+
+        usernameInput.sendKeys("valid_NewUsername");
+        passwordInput.sendKeys("valid_NewPassword");
+        loginButton.click();
+
+        // Assertion for login was successful
+        Assert.assertTrue(driver.getPageSource().contains("Welcome"));
+
+    }
+
+    @AfterClass
+    public void tearDown() {
+        if (driver != null) {
+            driver.quit();
+        }
+    }
+}
